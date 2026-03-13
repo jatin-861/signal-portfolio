@@ -38,28 +38,31 @@ export async function POST(request: Request) {
 
         if (dbError) {
             console.error('Supabase Error:', dbError);
-            return NextResponse.json({ error: 'Database submission failed' }, { status: 500 });
+            // Don't block — DB might not be set up yet, still try email
         }
 
-        // Send email via Resend
+        // Send email notification via Resend
+        // On Resend free tier, `to` must be the account owner's email
+        // Use `reply-to` so owner can reply directly to the visitor
         const recipient = process.env.CONTACT_RECIPIENT_EMAIL;
         if (recipient) {
-            const { error: emailError } = await resend.emails.send({
-                from: 'Signal Portfolio <onboarding@resend.dev>',
-                to: [recipient],
-                subject: `New Contact Submission from ${name}`,
-                text: `Name: ${name}\nEmail: ${email}\nMessage:\n${message}`,
-            });
-
-            if (emailError) {
-                console.error('Resend Error:', emailError);
-                return NextResponse.json({ error: 'Email sending failed' }, { status: 500 });
+            try {
+                await resend.emails.send({
+                    from: 'Signal Portfolio <onboarding@resend.dev>',
+                    to: [recipient],
+                    replyTo: email,
+                    subject: `[SIGNAL] New message from ${name}`,
+                    text: `New contact form submission:\n\nName: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+                });
+            } catch (emailError) {
+                // Email is a bonus notification, don't fail the request
+                console.warn('Email notification failed (non-blocking):', emailError);
             }
         }
 
         return NextResponse.json({ success: true });
     } catch (error) {
         console.error('Contact route error:', error);
-        return NextResponse.json({ error: error instanceof Error ? error.message : 'Internal logic error' }, { status: 500 });
+        return NextResponse.json({ error: error instanceof Error ? error.message : 'Internal error' }, { status: 500 });
     }
 }
