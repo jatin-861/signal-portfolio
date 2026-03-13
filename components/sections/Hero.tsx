@@ -22,48 +22,48 @@ export function Hero() {
     const progress = useScrollProgress();
 
     useEffect(() => {
-        const tl = gsap.timeline({ defaults: { ease: 'cubic-bezier(0.16, 1, 0.3, 1)' } });
+        const ctx = gsap.context(() => {
+            const tl = gsap.timeline({ defaults: { ease: 'cubic-bezier(0.16, 1, 0.3, 1)' } });
 
-        // Entrance animation sequence
-        tl.fromTo(eyebrowRef.current,
-            { y: 20, opacity: 0 },
-            { y: 0, opacity: 1, duration: 0.6 },
-            0.0
-        )
-            .fromTo(titleLine1Ref.current,
-                { x: -40, opacity: 0 },
-                { x: 0, opacity: 1, duration: 0.9 },
-                0.2
+            // Entrance animation sequence
+            tl.fromTo(eyebrowRef.current,
+                { y: 20, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.6 },
+                0.0
             )
-            .fromTo(titleLine2Ref.current,
-                { x: -40, opacity: 0 },
-                { x: 0, opacity: 1, duration: 0.9 },
-                0.4
-            )
-            .fromTo(titleLine3Ref.current,
-                { x: -40, opacity: 0 },
-                { x: 0, opacity: 1, duration: 0.9 },
-                0.6
-            )
-            .fromTo(subtextRef.current,
-                { opacity: 0, y: 10 },
-                { opacity: 1, y: 0, duration: 0.7 },
-                0.9
-            )
-            .fromTo(ctaRef.current ? Array.from(ctaRef.current.children) : [],
-                { scale: 0.9, opacity: 0 },
-                { scale: 1, opacity: 1, duration: 0.6, stagger: 0.08 },
-                1.1
-            )
-            .fromTo(scrollIndicatorRef.current,
-                { opacity: 0, y: -20 },
-                { opacity: 1, y: 0, duration: 0.6 },
-                1.4
-            );
+                .fromTo(titleLine1Ref.current,
+                    { x: -40, opacity: 0 },
+                    { x: 0, opacity: 1, duration: 0.9 },
+                    0.2
+                )
+                .fromTo(titleLine2Ref.current,
+                    { x: -40, opacity: 0 },
+                    { x: 0, opacity: 1, duration: 0.9 },
+                    0.4
+                )
+                .fromTo(titleLine3Ref.current,
+                    { x: -40, opacity: 0 },
+                    { x: 0, opacity: 1, duration: 0.9 },
+                    0.6
+                )
+                .fromTo(subtextRef.current,
+                    { opacity: 0, y: 10 },
+                    { opacity: 1, y: 0, duration: 0.7 },
+                    0.9
+                )
+                .fromTo(ctaRef.current ? Array.from(ctaRef.current.children) : [],
+                    { scale: 0.9, opacity: 0 },
+                    { scale: 1, opacity: 1, duration: 0.6, stagger: 0.08 },
+                    1.1
+                )
+                .fromTo(scrollIndicatorRef.current,
+                    { opacity: 0, y: -20 },
+                    { opacity: 1, y: 0, duration: 0.6 },
+                    1.4
+                );
+        }, containerRef);
 
-        return () => {
-            tl.kill();
-        };
+        return () => ctx.revert();
     }, []);
 
     return (
